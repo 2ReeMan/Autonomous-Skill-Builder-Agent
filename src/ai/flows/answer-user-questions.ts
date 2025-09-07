@@ -20,7 +20,7 @@ export type AnswerUserQuestionsInput = z.infer<typeof AnswerUserQuestionsInputSc
 
 const AnswerUserQuestionsOutputSchema = z.object({
   answer: z.string().describe('The answer to the user question.'),
-  resources: z.array(z.string()).describe('Relevant learning resources for the user.'),
+  resources: z.array(z.string()).describe('A list of relevant learning resources (URLs) for the user.'),
 });
 
 export type AnswerUserQuestionsOutput = z.infer<typeof AnswerUserQuestionsOutputSchema>;
@@ -34,14 +34,9 @@ const prompt = ai.definePrompt({
   input: {schema: AnswerUserQuestionsInputSchema},
   output: {schema: AnswerUserQuestionsOutputSchema},
   prompt: `You are an AI chatbot tutor designed to provide personalized guidance and motivation to users.
-  Answer the user's question and provide relevant learning resources to help them overcome learning obstacles and stay engaged.
+  Answer the user's question and provide relevant learning resources as URLs to help them overcome learning obstacles and stay engaged.
 
   Question: {{{question}}}
-
-  Format your response as follows:
-
-  Answer: <answer>
-  Resources: [<resource1>, <resource2>, ...]
   `,
 });
 

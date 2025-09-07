@@ -1,14 +1,16 @@
+
 'use client';
 import { useState } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, CheckCircle } from 'lucide-react';
+import { PlusCircle, CheckCircle, Search } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { generatePersonalizedRoadmap, GeneratePersonalizedRoadmapOutput } from '@/ai/flows/generate-personalized-roadmap';
 import { useUserProgress } from '@/hooks/use-user-progress';
 import { QuizClient } from '@/components/quiz-client';
+import { Input } from '@/components/ui/input';
 
 const skills = [
   { name: 'JavaScript', category: 'Web Development', description: 'The language of the web. Essential for front-end and back-end development.' },
@@ -30,6 +32,7 @@ export default function SkillsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [quizFinished, setQuizFinished] = useState(false);
   const { completeCourse, isCourseCompleted } = useUserProgress();
+  const [searchTerm, setSearchTerm] = useState('');
   
   const handleSkillSelect = async (skill: Skill) => {
     setSelectedSkill(skill);
@@ -54,6 +57,10 @@ export default function SkillsPage() {
     if (!selectedSkill) return;
     completeCourse(selectedSkill.name, score);
   };
+  
+  const filteredSkills = skills.filter((skill) =>
+    skill.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <main className="container mx-auto p-4 sm:p-6 lg:p-8">
@@ -62,32 +69,49 @@ export default function SkillsPage() {
           title="Skill Catalog"
           description="Explore our extensive library of skills and add them to your learning plan."
         />
-        <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {skills.map((skill) => (
-            <Card key={skill.name} className="flex flex-col">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>{skill.name}</CardTitle>
-                  <Badge variant="secondary">{skill.category}</Badge>
-                </div>
-                <CardDescription>{skill.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="mt-auto">
-                {isCourseCompleted(skill.name) ? (
-                  <Button variant="outline" disabled className="w-full">
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Completed
-                  </Button>
-                ) : (
-                  <Button variant="outline" className="w-full" onClick={() => handleSkillSelect(skill)}>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Start Learning
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        <div className="mt-6 mb-8 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search skills..."
+            className="w-full pl-10"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
+        
+        {filteredSkills.length > 0 ? (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredSkills.map((skill) => (
+              <Card key={skill.name} className="flex flex-col">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>{skill.name}</CardTitle>
+                    <Badge variant="secondary">{skill.category}</Badge>
+                  </div>
+                  <CardDescription>{skill.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="mt-auto">
+                  {isCourseCompleted(skill.name) ? (
+                    <Button variant="outline" disabled className="w-full">
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Completed
+                    </Button>
+                  ) : (
+                    <Button variant="outline" className="w-full" onClick={() => handleSkillSelect(skill)}>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Start Learning
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-muted-foreground py-12">
+            <p>No skills found matching "{searchTerm}".</p>
+          </div>
+        )}
       </div>
 
       <Dialog open={!!selectedSkill} onOpenChange={(isOpen) => !isOpen && setSelectedSkill(null)}>

@@ -6,6 +6,7 @@ import { FeatureCard } from '@/components/feature-card';
 import { AppLogo } from '@/components/app-logo';
 import { SignUpButton } from '@/components/auth/sign-up-button';
 import { SignInButton } from '@/components/auth/sign-in-button';
+import { StartJourneyButton } from '@/components/auth/start-journey-button';
 
 export default function Home() {
   return (
@@ -33,11 +34,7 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Button size="lg" asChild>
-              <Link href="/dashboard">
-                Start Your Journey <ArrowRight className="ml-2" />
-              </Link>
-            </Button>
+            <StartJourneyButton />
             <Button size="lg" variant="outline" asChild>
               <Link href="/skills">Explore Skills</Link>
             </Button>

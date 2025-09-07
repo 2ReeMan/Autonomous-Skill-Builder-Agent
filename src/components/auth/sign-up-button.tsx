@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,9 +8,10 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SignUpForm } from './sign-up-form';
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Phone } from 'lucide-react';
 
 export function SignUpButton() {
   const [open, setOpen] = useState(false);
@@ -27,7 +29,23 @@ export function SignUpButton() {
               Start your personalized learning journey with LearnFlowAI.
             </DialogDescription>
           </DialogHeader>
-          <SignUpForm onSignUp={() => setOpen(false)} />
+          <Tabs defaultValue="email">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="email">Email</TabsTrigger>
+              <TabsTrigger value="phone" disabled>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  Phone
+                </div>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="email">
+              <SignUpForm onSignUp={() => setOpen(false)} />
+            </TabsContent>
+            <TabsContent value="phone">
+              {/* Phone Sign Up Form will go here */}
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
     </>

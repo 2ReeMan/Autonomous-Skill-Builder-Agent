@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SignInForm } from './sign-in-form';
 import { SignUpForm } from './sign-up-form';
 import { useState } from 'react';
+import { Phone } from 'lucide-react';
 import Link from 'next/link';
 
 export function SignInButton() {
@@ -29,7 +31,23 @@ export function SignInButton() {
               Sign in to continue your learning journey.
             </DialogDescription>
           </DialogHeader>
-          <SignInForm onSignIn={() => setOpen(false)} />
+          <Tabs defaultValue="email">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="email">Email</TabsTrigger>
+              <TabsTrigger value="phone" disabled>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  Phone
+                </div>
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="email">
+              <SignInForm onSignIn={() => setOpen(false)} />
+            </TabsContent>
+            <TabsContent value="phone">
+              {/* Phone Sign In Form will go here */}
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
     </>

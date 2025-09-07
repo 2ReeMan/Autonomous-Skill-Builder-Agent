@@ -13,6 +13,7 @@ import { QuizClient } from '@/components/quiz-client';
 import { Input } from '@/components/ui/input';
 
 const skills = [
+  { name: 'HTML', category: 'Web Development', description: 'The standard markup language for creating web pages and web applications.' },
   { name: 'JavaScript', category: 'Web Development', description: 'The language of the web. Essential for front-end and back-end development.' },
   { name: 'React', category: 'Web Development', description: 'A popular JavaScript library for building user interfaces.' },
   { name: 'Node.js', category: 'Web Development', description: 'A JavaScript runtime for building fast and scalable server-side applications.' },

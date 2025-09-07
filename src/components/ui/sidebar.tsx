@@ -74,6 +74,7 @@ const SidebarProvider = React.forwardRef<
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen)
     const open = openProp ?? _open
+
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === "function" ? value(open) : value
@@ -89,6 +90,20 @@ const SidebarProvider = React.forwardRef<
       [setOpenProp, open]
     )
 
+    // Read the cookie only on the client side after mount.
+    React.useEffect(() => {
+      if (typeof window !== "undefined") {
+        const cookieValue = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith(`${SIDEBAR_COOKIE_NAME}=`))
+          ?.split("=")[1]
+
+        if (cookieValue !== undefined) {
+          _setOpen(cookieValue === "true")
+        }
+      }
+    }, [])
+    
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
       return isMobile

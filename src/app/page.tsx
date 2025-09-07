@@ -4,6 +4,8 @@ import { ArrowRight, Bot, GitMerge, Lightbulb, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FeatureCard } from '@/components/feature-card';
 import { AppLogo } from '@/components/app-logo';
+import { SignUpButton } from '@/components/auth/sign-up-button';
+import { SignInButton } from '@/components/auth/sign-in-button';
 
 export default function Home() {
   return (
@@ -15,14 +17,8 @@ export default function Home() {
             <span className="font-bold font-headline text-lg">LearnFlowAI</span>
           </Link>
           <nav className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/dashboard">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/dashboard">
-                Get Started <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            <SignInButton />
+            <SignUpButton />
           </nav>
         </div>
       </header>

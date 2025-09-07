@@ -1,8 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Bot, GitMerge, LayoutDashboard, Lightbulb, BookMarked, FileQuestion } from 'lucide-react';
-
+import { Bot, GitMerge, LayoutDashboard, Lightbulb, BookMarked, FileQuestion, LogOut } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -17,18 +16,20 @@ import { AppLogo } from './app-logo';
 import { Separator } from './ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
+import { useAuth } from '@/hooks/use-auth';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/roadmap', icon: GitMerge, label: 'Roadmap' },
   { href: '/projects', icon: Lightbulb, label: 'Projects' },
   { href: '/skills', icon: BookMarked, label: 'Skills' },
-  { href: '/quiz', icon: FileQuestion, label: 'Quiz' },
+  // { href: '/quiz', icon: FileQuestion, label: 'Quiz' }, // Removing standalone quiz page
   { href: '/tutor', icon: Bot, label: 'AI Tutor' },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const { user, signOut } = useAuth();
 
   return (
     <Sidebar>
@@ -64,15 +65,15 @@ export function AppSidebar() {
         <Separator className="my-2" />
         <div className="flex items-center gap-3 p-2">
             <Avatar>
-                <AvatarImage src="https://picsum.photos/100" data-ai-hint="user avatar" alt="User avatar" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarImage src={user?.photoURL || "https://picsum.photos/100"} data-ai-hint="user avatar" alt="User avatar" />
+                <AvatarFallback>{user?.displayName?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
             <div className="flex-1 overflow-hidden">
-                <p className="truncate font-semibold">User</p>
-                <p className="truncate text-xs text-muted-foreground">user@email.com</p>
+                <p className="truncate font-semibold">{user?.displayName || 'User'}</p>
+                <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={signOut}>
+                <LogOut />
             </Button>
         </div>
       </SidebarFooter>

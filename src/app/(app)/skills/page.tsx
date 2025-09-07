@@ -1,8 +1,14 @@
+'use client';
+import { useState } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, CheckCircle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { generatePersonalizedRoadmap, GeneratePersonalizedRoadmapOutput } from '@/ai/flows/generate-personalized-roadmap';
+import { useUserProgress } from '@/hooks/use-user-progress';
+import { QuizClient } from '@/components/quiz-client';
 
 const skills = [
   { name: 'JavaScript', category: 'Web Development', description: 'The language of the web. Essential for front-end and back-end development.' },
@@ -16,7 +22,39 @@ const skills = [
   { name: 'GraphQL', category: 'APIs', description: 'A query language for APIs and a runtime for fulfilling those queries with your existing data.' },
 ];
 
+type Skill = typeof skills[0];
+
 export default function SkillsPage() {
+  const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [generatedData, setGeneratedData] = useState<GeneratePersonalizedRoadmapOutput | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [quizFinished, setQuizFinished] = useState(false);
+  const { completeCourse, isCourseCompleted } = useUserProgress();
+  
+  const handleSkillSelect = async (skill: Skill) => {
+    setSelectedSkill(skill);
+    setIsLoading(true);
+    setGeneratedData(null);
+    setQuizFinished(false);
+    try {
+      const result = await generatePersonalizedRoadmap({
+        goal: `Master ${skill.name}`,
+        currentSkills: 'Beginner',
+        desiredRoadmapLength: 'short',
+      });
+      setGeneratedData(result);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCompleteCourse = (score: number) => {
+    if (!selectedSkill) return;
+    completeCourse(selectedSkill.name, score);
+  };
+
   return (
     <main className="container mx-auto p-4 sm:p-6 lg:p-8">
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -35,15 +73,64 @@ export default function SkillsPage() {
                 <CardDescription>{skill.description}</CardDescription>
               </CardHeader>
               <CardContent className="mt-auto">
-                <Button variant="outline" className="w-full">
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add to my Roadmap
-                </Button>
+                {isCourseCompleted(skill.name) ? (
+                  <Button variant="outline" disabled className="w-full">
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Completed
+                  </Button>
+                ) : (
+                  <Button variant="outline" className="w-full" onClick={() => handleSkillSelect(skill)}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Start Learning
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}
         </div>
       </div>
+
+      <Dialog open={!!selectedSkill} onOpenChange={(isOpen) => !isOpen && setSelectedSkill(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{selectedSkill?.name}</DialogTitle>
+            <DialogDescription>Your learning path and assessment for {selectedSkill?.name}.</DialogDescription>
+          </DialogHeader>
+          {isLoading ? (
+            <div className="flex-1 flex items-center justify-center">Loading...</div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-6 overflow-y-auto pr-2">
+              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-foreground">
+                <div dangerouslySetInnerHTML={{ __html: generatedData?.roadmap.replace(/\n/g, '<br />') || "" }} />
+              </div>
+              <div>
+                {generatedData?.quiz && (
+                  <QuizClient 
+                    questions={generatedData.quiz}
+                    onQuizFinish={(score) => {
+                      setQuizFinished(true);
+                      handleCompleteCourse(score);
+                    }}
+                  />
+                )}
+                {quizFinished && (
+                  isCourseCompleted(selectedSkill?.name || "") ? (
+                    <Button disabled className="mt-4 w-full">
+                        <CheckCircle className="mr-2"/>
+                        Course Completed
+                    </Button>
+                  ) : (
+                    // This button state should ideally not be seen if logic is correct
+                    <Button onClick={() => {}} className="mt-4 w-full">
+                        Mark Course as Complete
+                    </Button>
+                  )
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }

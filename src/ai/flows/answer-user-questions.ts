@@ -35,6 +35,7 @@ const prompt = ai.definePrompt({
   output: {schema: AnswerUserQuestionsOutputSchema},
   prompt: `You are an AI chatbot tutor designed to provide personalized guidance and motivation to users.
   Answer the user's question and provide relevant learning resources as URLs to help them overcome learning obstacles and stay engaged.
+  Provide your response as a valid JSON object.
 
   Question: {{{question}}}
   `,

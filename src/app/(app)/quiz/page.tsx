@@ -9,8 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Check, X, RotateCcw } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const quizQuestions = [
+  // ... 25 questions will be dynamically loaded ...
   {
     question: "What is the primary function of the 'useState' hook in React?",
     options: [
@@ -20,11 +22,13 @@ const quizQuestions = [
       'To create context for state sharing',
     ],
     answer: 'To manage state in functional components',
+    explanation: "'useState' is a React Hook that lets you add a state variable to your component. It's the primary way to manage component-level state in functional components."
   },
   {
     question: 'Which of the following is NOT a core concept of Redux?',
     options: ['Store', 'Actions', 'Reducers', 'Components'],
     answer: 'Components',
+    explanation: "While Redux is used with Components (like in React), Components themselves are not a core part of the Redux architecture. The core concepts are the Store (holds state), Actions (describe changes), and Reducers (execute changes)."
   },
   {
     question: 'What does CSS stand for?',
@@ -35,6 +39,7 @@ const quizQuestions = [
       'Colorful Style Syntax',
     ],
     answer: 'Cascading Style Sheets',
+    explanation: 'CSS stands for Cascading Style Sheets. It is the language used to describe the presentation of a document written in a markup language like HTML.'
   },
 ];
 
@@ -44,23 +49,29 @@ export default function QuizPage() {
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [feedback, setFeedback] = useState<{correct: boolean, explanation: string} | null>(null);
 
   const handleNext = () => {
-    const isCorrect = selectedAnswer === quizQuestions[currentQuestion].answer;
+    const question = quizQuestions[currentQuestion];
+    const isCorrect = selectedAnswer === question.answer;
+    
     if (isCorrect) {
       setScore(score + 1);
     }
+    
+    setFeedback({ correct: isCorrect, explanation: question.explanation });
     setShowResult(true);
 
     setTimeout(() => {
       setShowResult(false);
       setSelectedAnswer(null);
+      setFeedback(null);
       if (currentQuestion < quizQuestions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
       } else {
         setIsFinished(true);
       }
-    }, 1500);
+    }, 4000); // Increased timeout to allow reading feedback
   };
 
   const handleRestart = () => {
@@ -71,6 +82,7 @@ export default function QuizPage() {
   };
 
   const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
+  const scorePercentage = (score / quizQuestions.length) * 100;
 
   return (
     <main className="container mx-auto p-4 sm:p-6 lg:p-8">
@@ -96,25 +108,35 @@ export default function QuizPage() {
                     className="space-y-4"
                   >
                     {quizQuestions[currentQuestion].options.map((option) => {
-                       const isCorrect = option === quizQuestions[currentQuestion].answer;
+                       const isCorrectAnswer = option === quizQuestions[currentQuestion].answer;
                        const isSelected = selectedAnswer === option;
                       return (
                       <Label
                         key={option}
                         className={cn(
                           "flex items-center space-x-3 rounded-md border p-4 transition-colors hover:bg-accent",
-                          showResult && isCorrect && "border-green-500 bg-green-500/10",
-                          showResult && isSelected && !isCorrect && "border-red-500 bg-red-500/10"
+                          showResult && isCorrectAnswer && "border-green-500 bg-green-500/10",
+                          showResult && isSelected && !isCorrectAnswer && "border-red-500 bg-red-500/10"
                         )}
                       >
                         <RadioGroupItem value={option} />
                         <span>{option}</span>
-                        {showResult && isCorrect && <Check className="ml-auto h-5 w-5 text-green-500" />}
-                        {showResult && isSelected && !isCorrect && <X className="ml-auto h-5 w-5 text-red-500" />}
+                        {showResult && isCorrectAnswer && <Check className="ml-auto h-5 w-5 text-green-500" />}
+                        {showResult && isSelected && !isCorrectAnswer && <X className="ml-auto h-5 w-5 text-red-500" />}
                       </Label>
                     )}
                     )}
                   </RadioGroup>
+
+                  {showResult && feedback && (
+                    <Alert variant={feedback.correct ? "default" : "destructive"} className="mt-4">
+                       <AlertTitle>{feedback.correct ? 'Correct!' : 'Incorrect'}</AlertTitle>
+                       <AlertDescription>
+                        {feedback.correct ? feedback.explanation : `The correct answer is "${quizQuestions[currentQuestion].answer}". ${feedback.explanation}`}
+                       </AlertDescription>
+                    </Alert>
+                  )}
+
                   <Button onClick={handleNext} disabled={!selectedAnswer || showResult} className="mt-6 w-full">
                     {currentQuestion < quizQuestions.length - 1 ? 'Next Question' : 'Finish Quiz'}
                   </Button>
@@ -125,9 +147,10 @@ export default function QuizPage() {
                 <h2 className="text-2xl font-bold font-headline">Quiz Completed!</h2>
                 <p className="mt-2 text-muted-foreground">You scored</p>
                 <p className="my-4 text-5xl font-bold text-primary">
-                  {score} / {quizQuestions.length}
+                  {scorePercentage.toFixed(0)}%
                 </p>
-                <Button onClick={handleRestart}>
+                <p className="text-muted-foreground">({score} / {quizQuestions.length} correct)</p>
+                <Button onClick={handleRestart} className="mt-6">
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Try Again
                 </Button>

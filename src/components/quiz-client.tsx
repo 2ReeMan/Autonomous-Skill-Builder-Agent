@@ -27,33 +27,36 @@ export function QuizClient({ questions, onQuizFinish, onCompleteButton }: QuizCl
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
-  const [showResult, setShowResult] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [feedback, setFeedback] = useState<{ correct: boolean; explanation: string } | null>(null);
 
-  const handleNext = () => {
+  const handleAnswerSelect = (answer: string) => {
+    if (feedback) return; // Don't do anything if feedback is already being shown
+
+    setSelectedAnswer(answer);
+
     const question = questions[currentQuestion];
-    const isCorrect = selectedAnswer === question.correctAnswer;
+    const isCorrect = answer === question.correctAnswer;
+    const newScore = isCorrect ? score + 1 : score;
 
     if (isCorrect) {
-      setScore(score + 1);
+      setScore(newScore);
     }
 
     setFeedback({ correct: isCorrect, explanation: question.explanation });
-    setShowResult(true);
 
     setTimeout(() => {
-      setShowResult(false);
       setSelectedAnswer(null);
       setFeedback(null);
+
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
       } else {
         setIsFinished(true);
-        const finalScore = ((score + (isCorrect ? 1 : 0)) / questions.length) * 100;
+        const finalScore = (newScore / questions.length) * 100;
         onQuizFinish(finalScore);
       }
-    }, 4000);
+    }, 3000); // Wait 3 seconds before moving to the next question or finishing
   };
 
   const handleRestart = () => {
@@ -80,8 +83,8 @@ export function QuizClient({ questions, onQuizFinish, onCompleteButton }: QuizCl
               <Progress value={progress} className="my-4" />
               <RadioGroup
                 value={selectedAnswer ?? ''}
-                onValueChange={setSelectedAnswer}
-                disabled={showResult}
+                onValueChange={handleAnswerSelect}
+                disabled={!!feedback}
                 className="space-y-4"
               >
                 {questions[currentQuestion].options.map((option) => {
@@ -92,21 +95,21 @@ export function QuizClient({ questions, onQuizFinish, onCompleteButton }: QuizCl
                       key={option}
                       className={cn(
                         'flex items-center space-x-3 rounded-md border p-4 transition-colors hover:bg-accent',
-                        showResult && isCorrectAnswer && 'border-green-500 bg-green-500/10',
-                        showResult && isSelected && !isCorrectAnswer && 'border-red-500 bg-red-500/10'
+                        feedback && isCorrectAnswer && 'border-green-500 bg-green-500/10',
+                        feedback && isSelected && !isCorrectAnswer && 'border-red-500 bg-red-500/10'
                       )}
                     >
                       <RadioGroupItem value={option} />
                       <span>{option}</span>
-                      {showResult && isCorrectAnswer && <Check className="ml-auto h-5 w-5 text-green-500" />}
-                      {showResult && isSelected && !isCorrectAnswer && <X className="ml-auto h-5 w-5 text-red-500" />}
+                      {feedback && isCorrectAnswer && <Check className="ml-auto h-5 w-5 text-green-500" />}
+                      {feedback && isSelected && !isCorrectAnswer && <X className="ml-auto h-5 w-5 text-red-500" />}
                     </Label>
                   );
                 })}
               </RadioGroup>
 
-              {showResult && feedback && (
-                <Alert variant={feedback.correct ? 'default' : 'destructive'} className="mt-4">
+              {feedback && (
+                <Alert variant={feedback.correct ? 'default' : 'destructive'} className="mt-4 animate-in fade-in">
                   <AlertTitle>{feedback.correct ? 'Correct!' : 'Incorrect'}</AlertTitle>
                   <AlertDescription>
                     {feedback.correct
@@ -115,10 +118,6 @@ export function QuizClient({ questions, onQuizFinish, onCompleteButton }: QuizCl
                   </AlertDescription>
                 </Alert>
               )}
-
-              <Button onClick={handleNext} disabled={!selectedAnswer || showResult} className="mt-6 w-full">
-                {currentQuestion < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
-              </Button>
             </CardContent>
           </>
         ) : (

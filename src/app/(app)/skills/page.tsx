@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, CheckCircle, Search, Loader2, Book, Youtube, FileQuestion } from 'lucide-react';
+import { PlusCircle, CheckCircle, Search, Loader2, Book, Youtube, FileQuestion, Lightbulb } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
 import { generateQuiz, QuizQuestion } from '@/ai/flows/generate-quiz';
 import { getLearningResources } from '@/ai/flows/get-learning-resources';
@@ -183,8 +183,16 @@ export default function SkillsPage() {
               </div>
             ) : view === 'resources' && resources ? (
                 <div className="space-y-6">
+                    {resources.keyConcepts && resources.keyConcepts.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-2 flex items-center"><Lightbulb className="mr-2 h-4 w-4 text-primary"/> Key Concepts</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {resources.keyConcepts.map(concept => <Badge key={concept} variant="secondary">{concept}</Badge>)}
+                        </div>
+                      </div>
+                    )}
                     <div>
-                        <h4 className="font-semibold mb-2 flex items-center"><Book className="mr-2 h-4 w-4 text-primary"/> Resources</h4>
+                        <h4 className="font-semibold mb-2 flex items-center"><Book className="mr-2 h-4 w-4 text-primary"/> Web Resources</h4>
                         <ul className="list-disc list-inside space-y-2">
                         {resources.resources.map(res => <li key={res.url}><a href={res.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">{res.title}</a></li>)}
                         </ul>

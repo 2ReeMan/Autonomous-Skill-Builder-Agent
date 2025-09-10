@@ -23,7 +23,7 @@ const prompt = ai.definePrompt({
   name: 'getLearningResourcesPrompt',
   input: { schema: GetLearningResourcesInputSchema },
   output: { schema: GetLearningResourcesOutputSchema },
-  prompt: `You are an AI learning assistant. For the given topic, provide a list of 2-3 high-quality articles/tutorials and 2-3 relevant YouTube videos to help someone learn about it. For YouTube links, create a youtube search query URL (e.g., "https://www.youtube.com/results?search_query=...") to ensure the links are always functional.
+  prompt: `You are an AI learning assistant. For the given topic, provide a list of 3-5 key concepts to learn, 2-3 high-quality articles/tutorials, and 2-3 relevant YouTube videos to help someone learn about it. For YouTube links, create a youtube search query URL (e.g., "https://www.youtube.com/results?search_query=...") to ensure the links are always functional.
 
 Topic: {{{topic}}}
 `,

@@ -19,6 +19,9 @@ export const GetLearningResourcesInputSchema = z.object({
 });
 
 export const GetLearningResourcesOutputSchema = z.object({
+  keyConcepts: z
+    .array(z.string())
+    .describe('A list of 3-5 key concepts to learn for this topic.'),
   resources: z
     .array(ResourceSchema)
     .describe(

@@ -46,9 +46,12 @@ export default function SkillsPage() {
       setQuizData(result.quiz);
     } catch (error: any) {
       console.error(error);
-      const description = error.status === 429
-        ? "You have made too many requests. Please wait a while before trying again."
-        : "There was a problem generating the quiz. Please try again.";
+      let description = "There was a problem generating the quiz. Please try again.";
+      if (error.message && error.message.includes('503')) {
+        description = "The AI model is currently overloaded. Please wait a moment and try again.";
+      } else if (error.status === 429) {
+        description = "You have made too many requests. Please wait a while before trying again.";
+      }
       
       toast({
         variant: 'destructive',

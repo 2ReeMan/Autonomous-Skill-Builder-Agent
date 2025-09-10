@@ -7,11 +7,11 @@ The application is built with a modern web stack and leverages the power of Goog
 
 ## Core Features
 
--   **🤖 AI Chatbot Tutor**: Get instant, personalized help and resources from an AI tutor, available 24/7 to answer questions and clarify concepts.
 -   **🗺️ Personalized Roadmaps**: Receive step-by-step, AI-generated learning paths tailored to your specific career goals and existing skills.
 -   **📚 Skill Catalog & Learning Resources**: Explore a vast library of skills. For each skill, the AI provides key concepts, high-quality articles, and relevant YouTube videos to guide your learning.
 -   **🧠 Adaptive Quizzes**: Test your knowledge with smart quizzes generated on any topic. The quizzes provide instant feedback and explanations to reinforce learning.
 -   **💡 AI Project Recommendations**: Apply your knowledge with practical project ideas that match your interests and skill level, helping you build a strong portfolio.
+-   **🤖 AI Chatbot Tutor**: Get instant, personalized help and resources from an AI tutor, available 24/7 to answer questions and clarify concepts.
 -   **📊 Progress Tracking Dashboard**: Visualize your learning journey with a detailed dashboard that tracks your completed courses, average quiz scores, and skill mastery over time.
 
 ## Technology Stack

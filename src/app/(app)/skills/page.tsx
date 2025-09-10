@@ -5,9 +5,10 @@ import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, CheckCircle, Search, Loader2 } from 'lucide-react';
+import { PlusCircle, CheckCircle, Search, Loader2, Book, Youtube, FileQuestion } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
 import { generateQuiz, QuizQuestion } from '@/ai/flows/generate-quiz';
+import { getLearningResources, GetLearningResourcesOutput } from '@/ai/flows/get-learning-resources';
 import { useUserProgress } from '@/hooks/use-user-progress';
 import { QuizClient } from '@/components/quiz-client';
 import { Input } from '@/components/ui/input';
@@ -40,16 +41,41 @@ export default function SkillsPage() {
   const { toast } = useToast();
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [quizData, setQuizData] = useState<QuizQuestion[] | null>(null);
+  const [resources, setResources] = useState<GetLearningResourcesOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { completeCourse, isCourseCompleted } = useUserProgress();
   const [searchTerm, setSearchTerm] = useState('');
+  const [view, setView] = useState<'resources' | 'quiz'>('resources');
   
   const handleSkillSelect = async (skill: Skill) => {
     setSelectedSkill(skill);
     setIsLoading(true);
     setQuizData(null);
+    setResources(null);
+    setView('resources');
     try {
-      const result = await generateQuiz({ topic: skill.name });
+      const result = await getLearningResources({ topic: skill.name });
+      setResources(result);
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description: 'There was a problem fetching learning resources. Please try again.',
+      });
+      setSelectedSkill(null); // Close dialog on error
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const startQuiz = async () => {
+    if (!selectedSkill) return;
+    setIsLoading(true);
+    setQuizData(null);
+    setView('quiz');
+    try {
+      const result = await generateQuiz({ topic: selectedSkill.name });
       setQuizData(result.quiz);
     } catch (error: any) {
       console.error(error);
@@ -65,7 +91,7 @@ export default function SkillsPage() {
         title: 'Uh oh! Something went wrong.',
         description,
       });
-      setSelectedSkill(null); // Close dialog on error
+      setView('resources'); // Go back to resources view on error
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +104,6 @@ export default function SkillsPage() {
       title: `${selectedSkill.name} Completed!`,
       description: `You scored ${score.toFixed(0)}%. Your progress has been updated.`,
     });
-    // The button will appear in the QuizClient component
   };
   
   const filteredSkills = skills.filter((skill) =>
@@ -140,16 +165,41 @@ export default function SkillsPage() {
       <Dialog open={!!selectedSkill} onOpenChange={(isOpen) => !isOpen && setSelectedSkill(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Test Your Knowledge: {selectedSkill?.name}</DialogTitle>
-            <DialogDescription>Complete the quiz to mark this skill as complete.</DialogDescription>
+            <DialogTitle>Learn: {selectedSkill?.name}</DialogTitle>
+            <DialogDescription>
+                {view === 'resources' 
+                    ? 'Review these materials, then take the quiz to test your knowledge.'
+                    : 'Complete the quiz to mark this skill as complete.'}
+            </DialogDescription>
           </DialogHeader>
-          <div className="mt-4">
+          <div className="mt-4 max-h-[60vh] overflow-y-auto pr-2">
             {isLoading ? (
               <div className="flex items-center justify-center h-48">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="ml-4">Generating your quiz...</p>
+                <p className="ml-4">
+                  {view === 'resources' ? 'Fetching resources...' : 'Generating your quiz...'}
+                </p>
               </div>
-            ) : quizData ? (
+            ) : view === 'resources' && resources ? (
+                <div className="space-y-6">
+                    <div>
+                        <h4 className="font-semibold mb-2 flex items-center"><Book className="mr-2 h-4 w-4 text-primary"/> Resources</h4>
+                        <ul className="list-disc list-inside space-y-2">
+                        {resources.resources.map(res => <li key={res.url}><a href={res.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">{res.title}</a></li>)}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-2 flex items-center"><Youtube className="mr-2 h-4 w-4 text-primary"/> YouTube Videos</h4>
+                        <ul className="list-disc list-inside space-y-2">
+                        {resources.youtubeLinks.map(link => <li key={link.url}><a href={link.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">{link.title}</a></li>)}
+                        </ul>
+                    </div>
+                    <Button onClick={startQuiz} className="w-full mt-4">
+                        <FileQuestion className="mr-2" />
+                        Take the Quiz
+                    </Button>
+                </div>
+            ) : view === 'quiz' && quizData ? (
               <QuizClient 
                 questions={quizData}
                 onQuizFinish={handleQuizFinish}
@@ -163,7 +213,7 @@ export default function SkillsPage() {
                 }
               />
             ) : (
-                <p>No quiz available.</p>
+                <p>No content available.</p>
             )}
           </div>
         </DialogContent>

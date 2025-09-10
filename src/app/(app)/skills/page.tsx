@@ -24,6 +24,7 @@ const skills = [
   { name: 'Figma', category: 'UI/UX Design', description: 'A collaborative interface design tool for creating websites, apps, and more.' },
   { name: 'TypeScript', category: 'Web Development', description: 'A typed superset of JavaScript that compiles to plain JavaScript.' },
   { name: 'GraphQL', category: 'APIs', description: 'A query language for APIs and a runtime for fulfilling those queries with your existing data.' },
+  { name: 'Cinematography', category: 'Film Production', description: 'The art of motion-picture photography, including lighting and camera techniques.' },
 ];
 
 type Skill = typeof skills[0];

@@ -50,12 +50,15 @@ export default function RoadmapPage() {
     try {
       const result = await generatePersonalizedRoadmap(values);
       setGeneratedData(result);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      const description = (error.message && error.message.includes('503'))
+        ? "The AI model is currently overloaded. Please wait a moment and try again."
+        : 'There was a problem generating your roadmap. Please try again.';
       toast({
         variant: 'destructive',
         title: 'Uh oh! Something went wrong.',
-        description: 'There was a problem generating your roadmap. Please try again.',
+        description: description,
       });
     } finally {
       setIsLoading(false);

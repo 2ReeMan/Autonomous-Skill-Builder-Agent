@@ -85,7 +85,7 @@ export default function Home() {
       </main>
       <footer className="border-t">
         <div className="container flex h-14 items-center justify-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} LearnFlowAI. All rights reserved.
+          © 2025 LearnFlowAI. All Rights Reserved To Botla Varshini
         </div>
       </footer>
     </div>

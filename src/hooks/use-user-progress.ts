@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
@@ -16,9 +17,11 @@ export function useUserProgress() {
 
   const fetchProgress = useCallback(async () => {
     if (!user) {
+      setCompletedCourses([]);
       setLoading(false);
       return;
     }
+
     setLoading(true);
     try {
       const userProgressRef = doc(db, 'userProgress', user.uid);
@@ -32,6 +35,8 @@ export function useUserProgress() {
       }
     } catch (error) {
       console.error('Error fetching user progress:', error);
+      // In case of error (e.g., offline), keep existing state or default to empty
+      setCompletedCourses([]);
     } finally {
       setLoading(false);
     }
@@ -46,6 +51,12 @@ export function useUserProgress() {
 
     const userProgressRef = doc(db, 'userProgress', user.uid);
     const newCourse: CompletedCourse = { courseId, score };
+
+    // Optimistically update the UI
+    const courseAlreadyCompleted = completedCourses.some(c => c.courseId === courseId);
+    if (!courseAlreadyCompleted) {
+        setCompletedCourses((prev) => [...prev, newCourse]);
+    }
 
     try {
       const docSnap = await getDoc(userProgressRef);
@@ -65,9 +76,12 @@ export function useUserProgress() {
           completedCourses: [newCourse],
         });
       }
-      setCompletedCourses((prev) => [...prev, newCourse]);
     } catch (error) {
       console.error('Error completing course:', error);
+      // Revert optimistic update on error
+      if(!courseAlreadyCompleted) {
+        setCompletedCourses((prev) => prev.filter(c => c.courseId !== courseId));
+      }
     }
   };
 

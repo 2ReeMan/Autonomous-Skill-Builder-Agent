@@ -18,7 +18,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { Separator } from '../ui/separator';
+import Link from 'next/link';
 
 const GoogleIcon = () => (
     <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -50,7 +50,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function SignInForm({ onSignIn }: { onSignIn: () => void }) {
+export function SignInForm() {
   const { signIn, signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -69,7 +69,6 @@ export function SignInForm({ onSignIn }: { onSignIn: () => void }) {
     setError(null);
     try {
       await signIn(values.email, values.password);
-      onSignIn();
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -82,7 +81,6 @@ export function SignInForm({ onSignIn }: { onSignIn: () => void }) {
     setError(null);
     try {
       await signInWithGoogle();
-      onSignIn();
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -98,22 +96,7 @@ export function SignInForm({ onSignIn }: { onSignIn: () => void }) {
             <AlertDescription>{error}</AlertDescription>
         </Alert>
         )}
-      <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
-        {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon />}
-        Sign in with Google
-      </Button>
 
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or continue with
-          </span>
-        </div>
-      </div>
-    
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -134,7 +117,12 @@ export function SignInForm({ onSignIn }: { onSignIn: () => void }) {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <div className="flex justify-between items-center">
+                    <FormLabel>Password</FormLabel>
+                    <Link href="/forgot-password" passHref legacyBehavior>
+                        <a className="text-sm font-medium text-primary hover:underline">Forgot password?</a>
+                    </Link>
+                </div>
                 <FormControl>
                   <Input type="password" {...field} />
                 </FormControl>
@@ -148,6 +136,20 @@ export function SignInForm({ onSignIn }: { onSignIn: () => void }) {
           </Button>
         </form>
       </Form>
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Or continue with
+          </span>
+        </div>
+      </div>
+      <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={isGoogleLoading || isLoading}>
+        {isGoogleLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon />}
+        Sign in with Google
+      </Button>
     </div>
   );
 }

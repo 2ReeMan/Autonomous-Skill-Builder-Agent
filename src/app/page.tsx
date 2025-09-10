@@ -1,12 +1,8 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, GitMerge, Lightbulb, Zap } from 'lucide-react';
-
+import { ArrowRight, Bot, GitMerge, Lightbulb, Zap, CheckCircle, BarChart, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FeatureCard } from '@/components/feature-card';
 import { AppLogo } from '@/components/app-logo';
-import { SignUpButton } from '@/components/auth/sign-up-button';
-import { SignInButton } from '@/components/auth/sign-in-button';
-import { StartJourneyButton } from '@/components/auth/start-journey-button';
 
 export default function Home() {
   return (
@@ -17,9 +13,13 @@ export default function Home() {
             <AppLogo className="h-6 w-6 text-primary" />
             <span className="font-bold font-headline text-lg">LearnFlowAI</span>
           </Link>
-          <nav className="flex items-center gap-4">
-            <SignInButton />
-            <SignUpButton />
+          <nav className="flex items-center gap-2">
+             <Button variant="ghost" asChild>
+                <Link href="/sign-in">Sign In</Link>
+            </Button>
+            <Button asChild>
+                <Link href="/sign-up">Get Started <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
           </nav>
         </div>
       </header>
@@ -34,9 +34,8 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <StartJourneyButton />
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/skills">Explore Skills</Link>
+            <Button size="lg" asChild>
+                <Link href="/sign-up">Start Your Journey <ArrowRight className="ml-2" /></Link>
             </Button>
           </div>
         </section>
@@ -72,12 +71,12 @@ export default function Home() {
               description="Stuck on a concept? Get instant, personalized help and resources from your AI tutor, 24/7."
             />
              <FeatureCard
-              icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20V16"/></svg>}
+              icon={<BarChart/>}
               title="Progress Tracking"
               description="Visualize your journey with a detailed dashboard tracking your course completions, quiz scores, and skill mastery."
             />
             <FeatureCard
-              icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8"><path d="m9 10 3 3 3-3"/><path d="m9 17 3 3 3-3"/><path d="M2 12v3a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-3"/><path d="M2 7v3a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7"/></svg>}
+              icon={<BookOpen/>}
               title="Skill Catalog"
               description="Explore a vast library of skills, from programming languages to design principles, and add them to your learning plan."
             />

@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Bot, GitMerge, LayoutDashboard, Lightbulb, BookMarked, FileQuestion, LogOut } from 'lucide-react';
+import { Bot, GitMerge, LayoutDashboard, Lightbulb, BookMarked, FileQuestion, LogOut, CheckSquare } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -20,11 +20,11 @@ import { useAuth } from '@/hooks/use-auth';
 
 const navItems = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/roadmap', icon: GitMerge, label: 'Roadmap' },
-  { href: '/projects', icon: Lightbulb, label: 'Projects' },
   { href: '/skills', icon: BookMarked, label: 'Skills' },
-  // { href: '/quiz', icon: FileQuestion, label: 'Quiz' }, // Removing standalone quiz page
+  { href: '/roadmap', icon: GitMerge, label: 'Roadmap Generator' },
   { href: '/tutor', icon: Bot, label: 'AI Tutor' },
+  { href: '/projects', icon: Lightbulb, label: 'AI Projects' },
+  { href: '/quiz', icon: FileQuestion, label: 'AI Quiz' },
 ];
 
 export function AppSidebar() {

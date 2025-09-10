@@ -15,15 +15,22 @@ import { useToast } from '@/hooks/use-toast';
 
 const skills = [
   { name: 'HTML', category: 'Web Development', description: 'The standard markup language for creating web pages and web applications.' },
+  { name: 'CSS', category: 'Web Development', description: 'The language for describing the presentation of Web pages, including colors, layout, and fonts.' },
   { name: 'JavaScript', category: 'Web Development', description: 'The language of the web. Essential for front-end and back-end development.' },
+  { name: 'TypeScript', category: 'Web Development', description: 'A typed superset of JavaScript that compiles to plain JavaScript.' },
   { name: 'React', category: 'Web Development', description: 'A popular JavaScript library for building user interfaces.' },
+  { name: 'Next.js', category: 'Web Development', description: 'A React framework for building full-stack web applications.' },
   { name: 'Node.js', category: 'Web Development', description: 'A JavaScript runtime for building fast and scalable server-side applications.' },
   { name: 'Python', category: 'Data Science', description: 'A versatile language widely used in data analysis, machine learning, and AI.' },
   { name: 'SQL', category: 'Databases', description: 'The standard language for managing and querying relational databases.' },
+  { name: 'MongoDB', category: 'Databases', description: 'A popular NoSQL database for building modern applications.' },
   { name: 'Docker', category: 'DevOps', description: 'A platform for developing, shipping, and running applications in containers.' },
+  { name: 'Kubernetes', category: 'DevOps', description: 'An open-source system for automating deployment, scaling, and management of containerized applications.' },
   { name: 'Figma', category: 'UI/UX Design', description: 'A collaborative interface design tool for creating websites, apps, and more.' },
-  { name: 'TypeScript', category: 'Web Development', description: 'A typed superset of JavaScript that compiles to plain JavaScript.' },
   { name: 'GraphQL', category: 'APIs', description: 'A query language for APIs and a runtime for fulfilling those queries with your existing data.' },
+  { name: 'REST APIs', category: 'APIs', description: 'Architectural style for creating networked applications.' },
+  { name: 'Git', category: 'Version Control', description: 'A free and open source distributed version control system.' },
+  { name: 'Machine Learning', category: 'Data Science', description: 'The scientific study of algorithms and statistical models that computer systems use.' },
   { name: 'Cinematography', category: 'Film Production', description: 'The art of motion-picture photography, including lighting and camera techniques.' },
 ];
 

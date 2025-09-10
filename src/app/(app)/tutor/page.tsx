@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Bot, User, Send, CornerDownLeft, Loader2 } from 'lucide-react';
+import { Bot, User, Send, Loader2 } from 'lucide-react';
 
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { answerUserQuestions } from '@/ai/flows/answer-user-questions';
+import { useAuth } from '@/hooks/use-auth';
 
 interface Message {
   role: 'user' | 'ai';
@@ -21,6 +22,7 @@ interface Message {
 
 export default function TutorPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'ai',
@@ -100,6 +102,7 @@ export default function TutorPage() {
                     </div>
                     {message.role === 'user' && (
                       <Avatar className="h-8 w-8">
+                        {user?.photoURL && <AvatarImage src={user.photoURL} alt="User avatar" />}
                         <AvatarFallback><User /></AvatarFallback>
                       </Avatar>
                     )}

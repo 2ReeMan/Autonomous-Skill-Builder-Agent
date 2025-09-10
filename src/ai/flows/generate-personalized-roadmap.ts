@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { QuizQuestionSchema } from './generate-quiz';
+import { QuizQuestionSchema } from '@/ai/schema/quiz-schema';
 
 
 const GeneratePersonalizedRoadmapOutputSchema = z.object({

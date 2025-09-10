@@ -12,9 +12,24 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { QuizQuestionSchema } from '@/ai/schema/quiz-schema';
 
+const RoadmapResourceSchema = z.object({
+  title: z.string().describe("The title of the resource or video."),
+  url: z.string().url().describe("The full URL to the resource or video."),
+});
+
+const RoadmapStepSchema = z.object({
+  title: z.string().describe("The title of this step in the roadmap."),
+  description: z.string().describe("A concise description of what this step covers."),
+  keyConcepts: z.array(z.string()).describe("A list of key concepts to learn in this step."),
+  resources: z.array(RoadmapResourceSchema).describe("A list of high-quality articles, tutorials, or documentation."),
+  youtubeLinks: z.array(RoadmapResourceSchema).describe("A list of relevant YouTube videos. The URL should be a YouTube search query if a specific video is not available."),
+});
 
 const GeneratePersonalizedRoadmapOutputSchema = z.object({
-  roadmap: z.string().describe('A personalized learning roadmap for the user in markdown format.'),
+  title: z.string().describe("The main title for the entire learning roadmap."),
+  introduction: z.string().describe("A brief, encouraging introduction to the roadmap."),
+  steps: z.array(RoadmapStepSchema).describe("An array of 3-5 learning steps."),
+  conclusion: z.string().describe("A motivating conclusion to wrap up the roadmap."),
   quiz: z.array(QuizQuestionSchema).describe('A quiz with 10 questions to test the user\'s knowledge on the roadmap topics.'),
 });
 
@@ -50,8 +65,11 @@ const prompt = ai.definePrompt({
   input: {schema: GeneratePersonalizedRoadmapInputSchema},
   output: {schema: GeneratePersonalizedRoadmapOutputSchema},
   prompt: `You are an AI learning roadmap generator. You take a user's learning goal,
-their current skills, and desired roadmap length as input, and generate a personalized
-learning roadmap for them. Also generate a comprehensive 10-question quiz based on the topics in the roadmap.
+their current skills, and desired roadmap length as input, and generate a personalized,
+structured learning roadmap for them. The roadmap should be broken down into 3-5 distinct steps.
+For each step, provide a title, description, key concepts, a list of article/documentation resources,
+and a list of YouTube video resources. For YouTube links, create a youtube search query URL (e.g., "https://www.youtube.com/results?search_query=...")
+to ensure the links are always functional and relevant. Also generate a comprehensive 10-question quiz based on the topics in the roadmap.
 
 User Goal: {{{goal}}}
 Current Skills: {{{currentSkills}}}

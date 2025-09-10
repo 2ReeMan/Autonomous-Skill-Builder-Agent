@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Wand2, CheckCircle } from 'lucide-react';
+import { Loader2, Wand2, CheckCircle, Book, Youtube, Lightbulb } from 'lucide-react';
 
 import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +17,8 @@ import { useToast } from '@/hooks/use-toast';
 import { generatePersonalizedRoadmap, GeneratePersonalizedRoadmapOutput } from '@/ai/flows/generate-personalized-roadmap';
 import { useUserProgress } from '@/hooks/use-user-progress';
 import { QuizClient } from '@/components/quiz-client';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
 
 const roadmapFormSchema = z.object({
   goal: z.string().min(5, { message: 'Please describe your goal in more detail.' }),
@@ -81,8 +83,8 @@ export default function RoadmapPage() {
           description="Tell us your goals, and our AI will craft a unique learning path just for you."
         />
         <div className="mt-6 grid gap-8 lg:grid-cols-2">
-          {!generatedData ? (
-            <Card>
+          {!generatedData && !isLoading ? (
+            <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle>Create Your Roadmap</CardTitle>
                 <CardDescription>Fill out the form below to get started.</CardDescription>
@@ -139,72 +141,95 @@ export default function RoadmapPage() {
                       )}
                     />
                     <Button type="submit" disabled={isLoading} className="w-full">
-                      {isLoading ? (
-                        <Loader2 className="animate-spin" />
-                      ) : (
-                        <>
-                          <Wand2 className="mr-2" />
-                          Generate Roadmap
-                        </>
-                      )}
+                      <Wand2 className="mr-2" />
+                      Generate Roadmap
                     </Button>
                   </form>
                 </Form>
               </CardContent>
             </Card>
-          ) : (
+          ) : null}
+
+          {isLoading && (
+            <Card className="lg:col-span-2 flex items-center justify-center h-96">
+              <div className="text-center text-muted-foreground p-8">
+                <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
+                <p className="mt-4 text-lg">Generating your personalized path...</p>
+                <p className="text-sm">This might take a moment.</p>
+              </div>
+            </Card>
+          )}
+
+          {generatedData && (
             <>
-              <Card className="flex flex-col">
-                <CardHeader>
-                  <CardTitle>Your AI-Generated Path</CardTitle>
-                  <CardDescription>Follow this roadmap to achieve your learning goals.</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  {generatedData.roadmap && (
-                    <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-foreground">
-                      <div dangerouslySetInnerHTML={{ __html: generatedData.roadmap.replace(/\n/g, '<br />') }} />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-              <Card>
+              <div className="space-y-6 animate-in fade-in duration-500">
+                <Card className="bg-transparent border-0 shadow-none">
+                  <CardHeader className="p-0">
+                    <CardTitle className="text-3xl font-headline">{generatedData.title}</CardTitle>
+                    <CardDescription>{generatedData.introduction}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="p-0 mt-6">
+                    <Accordion type="single" collapsible className="w-full space-y-4">
+                      {generatedData.steps.map((step, index) => (
+                        <AccordionItem key={index} value={`item-${index}`} className="border bg-card rounded-lg px-4">
+                          <AccordionTrigger className="hover:no-underline font-semibold">
+                            Step {index + 1}: {step.title}
+                          </AccordionTrigger>
+                          <AccordionContent className="space-y-4 pt-2">
+                            <p className="text-muted-foreground">{step.description}</p>
+                            
+                            <div>
+                              <h4 className="font-semibold mb-2 flex items-center"><Lightbulb className="mr-2 h-4 w-4 text-primary"/> Key Concepts</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {step.keyConcepts.map(concept => <Badge key={concept} variant="secondary">{concept}</Badge>)}
+                              </div>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold mb-2 flex items-center"><Book className="mr-2 h-4 w-4 text-primary"/> Resources</h4>
+                              <ul className="list-disc list-inside space-y-1">
+                                {step.resources.map(res => <li key={res.url}><a href={res.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">{res.title}</a></li>)}
+                              </ul>
+                            </div>
+                            
+                            <div>
+                              <h4 className="font-semibold mb-2 flex items-center"><Youtube className="mr-2 h-4 w-4 text-primary"/> YouTube Videos</h4>
+                              <ul className="list-disc list-inside space-y-1">
+                                {step.youtubeLinks.map(link => <li key={link.url}><a href={link.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">{link.title}</a></li>)}
+                              </ul>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                     <p className="mt-6 text-muted-foreground">{generatedData.conclusion}</p>
+                  </CardContent>
+                </Card>
+              </div>
+              <Card className="h-fit sticky top-8 animate-in fade-in duration-500 delay-200">
                 <CardHeader>
                   <CardTitle>Test Your Knowledge</CardTitle>
                   <CardDescription>Complete the quiz to mark this roadmap as complete.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <QuizClient 
-                    questions={generatedData.quiz} 
-                    onQuizFinish={(score) => {
-                      setQuizFinished(true);
-                      handleCompleteCourse(score);
-                    }} 
-                  />
-                  {quizFinished && (
-                     isCourseCompleted(courseId) ? (
-                        <Button disabled className="mt-4 w-full">
-                            <CheckCircle className="mr-2"/>
-                            Roadmap Completed
-                        </Button>
-                     ) : (
-                        // This button state should ideally not be seen if logic is correct
-                        <Button onClick={() => {}} className="mt-4 w-full">
-                            Mark Roadmap as Complete
-                        </Button>
-                     )
+                  {isCourseCompleted(courseId) ? (
+                     <div className='text-center p-8 bg-green-500/10 rounded-lg border border-green-500/20'>
+                        <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
+                        <h3 className="mt-4 font-bold text-xl">Roadmap Completed!</h3>
+                        <p className="text-muted-foreground mt-2">You've successfully finished this learning path. Great job!</p>
+                     </div>
+                  ) : (
+                    <QuizClient 
+                      questions={generatedData.quiz} 
+                      onQuizFinish={(score) => {
+                        setQuizFinished(true);
+                        handleCompleteCourse(score);
+                      }} 
+                    />
                   )}
                 </CardContent>
               </Card>
             </>
-          )}
-
-          {isLoading && (
-            <Card className="flex items-center justify-center">
-              <div className="text-center text-muted-foreground">
-                <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-                <p className="mt-4">Generating your personalized path...</p>
-              </div>
-            </Card>
           )}
 
         </div>

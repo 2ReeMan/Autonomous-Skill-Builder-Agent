@@ -11,7 +11,7 @@ interface CompletedCourse {
 }
 
 export function useUserProgress() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [completedCourses, setCompletedCourses] = useState<CompletedCourse[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,8 +43,14 @@ export function useUserProgress() {
   }, [user]);
 
   useEffect(() => {
-    fetchProgress();
-  }, [fetchProgress]);
+    // Only fetch progress if auth is done loading and we have a user.
+    if (!authLoading && user) {
+      fetchProgress();
+    } else if (!authLoading && !user) {
+      // If auth is done and there's no user, we can stop loading.
+      setLoading(false);
+    }
+  }, [authLoading, user, fetchProgress]);
 
   const completeCourse = async (courseId: string, score: number) => {
     if (!user) return;
@@ -95,7 +101,7 @@ export function useUserProgress() {
 
   return {
     completedCourses,
-    loading,
+    loading: authLoading || loading,
     completeCourse,
     isCourseCompleted,
     averageScore,

@@ -4,3 +4,4 @@ config();
 import '@/ai/flows/generate-personalized-roadmap.ts';
 import '@/ai/flows/answer-user-questions.ts';
 import '@/ai/flows/get-project-recommendations.ts';
+import '@/ai/flows/generate-quiz.ts';

@@ -10,19 +10,12 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { QuizQuestionSchema } from './generate-quiz';
 
-const QuizQuestionSchema = z.object({
-  question: z.string().describe('The quiz question.'),
-  options: z.array(z.string()).describe('A list of 4 multiple-choice options.'),
-  correctAnswer: z.string().describe('The correct answer from the options.'),
-  explanation: z
-    .string()
-    .describe('A detailed explanation of why the correct answer is correct.'),
-});
 
 const GeneratePersonalizedRoadmapOutputSchema = z.object({
   roadmap: z.string().describe('A personalized learning roadmap for the user in markdown format.'),
-  quiz: z.array(QuizQuestionSchema).describe('A quiz with 25 questions to test the user\'s knowledge on the roadmap topics.'),
+  quiz: z.array(QuizQuestionSchema).describe('A quiz with 10 questions to test the user\'s knowledge on the roadmap topics.'),
 });
 
 export type GeneratePersonalizedRoadmapOutput = z.infer<
@@ -58,7 +51,7 @@ const prompt = ai.definePrompt({
   output: {schema: GeneratePersonalizedRoadmapOutputSchema},
   prompt: `You are an AI learning roadmap generator. You take a user's learning goal,
 their current skills, and desired roadmap length as input, and generate a personalized
-learning roadmap for them. Also generate a comprehensive 25-question quiz based on the topics in the roadmap.
+learning roadmap for them. Also generate a comprehensive 10-question quiz based on the topics in the roadmap.
 
 User Goal: {{{goal}}}
 Current Skills: {{{currentSkills}}}

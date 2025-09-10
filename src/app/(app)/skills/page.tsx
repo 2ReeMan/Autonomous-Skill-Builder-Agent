@@ -5,12 +5,13 @@ import { PageHeader } from '@/components/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, CheckCircle, Search } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { generatePersonalizedRoadmap, GeneratePersonalizedRoadmapOutput } from '@/ai/flows/generate-personalized-roadmap';
+import { PlusCircle, CheckCircle, Search, Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from '@/components/ui/dialog';
+import { generateQuiz, QuizQuestion } from '@/ai/flows/generate-quiz';
 import { useUserProgress } from '@/hooks/use-user-progress';
 import { QuizClient } from '@/components/quiz-client';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 const skills = [
   { name: 'HTML', category: 'Web Development', description: 'The standard markup language for creating web pages and web applications.' },
@@ -28,35 +29,45 @@ const skills = [
 type Skill = typeof skills[0];
 
 export default function SkillsPage() {
+  const { toast } = useToast();
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
-  const [generatedData, setGeneratedData] = useState<GeneratePersonalizedRoadmapOutput | null>(null);
+  const [quizData, setQuizData] = useState<QuizQuestion[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [quizFinished, setQuizFinished] = useState(false);
   const { completeCourse, isCourseCompleted } = useUserProgress();
   const [searchTerm, setSearchTerm] = useState('');
   
   const handleSkillSelect = async (skill: Skill) => {
     setSelectedSkill(skill);
     setIsLoading(true);
-    setGeneratedData(null);
-    setQuizFinished(false);
+    setQuizData(null);
     try {
-      const result = await generatePersonalizedRoadmap({
-        goal: `Master ${skill.name}`,
-        currentSkills: 'Beginner',
-        desiredRoadmapLength: 'short',
-      });
-      setGeneratedData(result);
-    } catch (error) {
+      const result = await generateQuiz({ topic: skill.name });
+      setQuizData(result.quiz);
+    } catch (error: any) {
       console.error(error);
+      const description = error.status === 429
+        ? "You have made too many requests. Please wait a while before trying again."
+        : "There was a problem generating the quiz. Please try again.";
+      
+      toast({
+        variant: 'destructive',
+        title: 'Uh oh! Something went wrong.',
+        description,
+      });
+      setSelectedSkill(null); // Close dialog on error
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCompleteCourse = (score: number) => {
+  const handleQuizFinish = (score: number) => {
     if (!selectedSkill) return;
     completeCourse(selectedSkill.name, score);
+    toast({
+      title: `${selectedSkill.name} Completed!`,
+      description: `You scored ${score.toFixed(0)}%. Your progress has been updated.`,
+    });
+    // The button will appear in the QuizClient component
   };
   
   const filteredSkills = skills.filter((skill) =>
@@ -116,44 +127,34 @@ export default function SkillsPage() {
       </div>
 
       <Dialog open={!!selectedSkill} onOpenChange={(isOpen) => !isOpen && setSelectedSkill(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{selectedSkill?.name}</DialogTitle>
-            <DialogDescription>Your learning path and assessment for {selectedSkill?.name}.</DialogDescription>
+            <DialogTitle>Test Your Knowledge: {selectedSkill?.name}</DialogTitle>
+            <DialogDescription>Complete the quiz to mark this skill as complete.</DialogDescription>
           </DialogHeader>
-          {isLoading ? (
-            <div className="flex-1 flex items-center justify-center">Loading...</div>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-6 overflow-y-auto pr-2">
-              <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap text-foreground">
-                <div dangerouslySetInnerHTML={{ __html: generatedData?.roadmap.replace(/\n/g, '<br />') || "" }} />
+          <div className="mt-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-48">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="ml-4">Generating your quiz...</p>
               </div>
-              <div>
-                {generatedData?.quiz && (
-                  <QuizClient 
-                    questions={generatedData.quiz}
-                    onQuizFinish={(score) => {
-                      setQuizFinished(true);
-                      handleCompleteCourse(score);
-                    }}
-                  />
-                )}
-                {quizFinished && (
-                  isCourseCompleted(selectedSkill?.name || "") ? (
-                    <Button disabled className="mt-4 w-full">
-                        <CheckCircle className="mr-2"/>
-                        Course Completed
+            ) : quizData ? (
+              <QuizClient 
+                questions={quizData}
+                onQuizFinish={handleQuizFinish}
+                onCompleteButton={
+                  <DialogClose asChild>
+                     <Button className="w-full mt-4">
+                      <CheckCircle className="mr-2" />
+                      Done
                     </Button>
-                  ) : (
-                    // This button state should ideally not be seen if logic is correct
-                    <Button onClick={() => {}} className="mt-4 w-full">
-                        Mark Course as Complete
-                    </Button>
-                  )
-                )}
-              </div>
-            </div>
-          )}
+                  </DialogClose>
+                }
+              />
+            ) : (
+                <p>No quiz available.</p>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </main>

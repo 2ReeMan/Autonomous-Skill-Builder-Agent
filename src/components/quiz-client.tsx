@@ -20,9 +20,10 @@ interface QuizQuestion {
 interface QuizClientProps {
   questions: QuizQuestion[];
   onQuizFinish: (score: number) => void;
+  onCompleteButton?: React.ReactNode;
 }
 
-export function QuizClient({ questions, onQuizFinish }: QuizClientProps) {
+export function QuizClient({ questions, onQuizFinish, onCompleteButton }: QuizClientProps) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
@@ -128,10 +129,14 @@ export function QuizClient({ questions, onQuizFinish }: QuizClientProps) {
             <p className="text-muted-foreground">
               ({score} / {questions.length} correct)
             </p>
-            <Button onClick={handleRestart} className="mt-6">
-              <RotateCcw className="mr-2 h-4 w-4" />
-              Try Again
-            </Button>
+            {onCompleteButton ? (
+              onCompleteButton
+            ) : (
+              <Button onClick={handleRestart} className="mt-6">
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Try Again
+              </Button>
+            )}
           </CardContent>
         )}
       </Card>

